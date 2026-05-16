@@ -1,0 +1,44 @@
+flowchart LR
+    subgraph CLIENT["CLIENT / USER"]
+        User["👤 User\nBrowser"]
+        SignIn["Private\nSign-in Page"]
+    end
+
+    subgraph AUTH["AUTHENTICATION"]
+        Cognito["☁️ Amazon Cognito\nUser Pool + App Client\nHosted UI / callback / logout"]
+        Token["Auth Token\nID/access token after login"]
+    end
+
+    subgraph APP["SERVERLESS APP"]
+        APIGW["⬡ API Gateway\nUploader endpoint"]
+        Galleria["⬡ Galleria\nGallery interface\nreads full-size + thumbnails"]
+        UploadLogic["λ Upload Logic\nLambda-backed flow\nwrites originals to S3"]
+    end
+
+    subgraph PIPELINE["IMAGE PIPELINE / STORAGE"]
+        Originals[("Originals Bucket\nprivate S3\nimage storage")]
+        Transform["λ Transform\nresize / compress / rotate\ntriggered by S3 event"]
+        Transform2["λ Transform\nresize / compress / rotate\ntriggered by S3 event"]
+        Transform3["λ Transform\nresize / compress / rotate\ntriggered by S3 event"]
+        Processed[("Processed Bucket\nthumbnails / resized images")]
+        CW["📊 CloudWatch\nLogs + Metrics"]
+    end
+
+    User -->|"1. sign in"| Cognito
+    Cognito -->|"2. tokens"| Token
+    Token -->|"private route"| SignIn
+    SignIn --> User
+    User -->|"3. authenticated access"| Galleria
+    User --> APIGW
+    APIGW -->|"4. upload original"| UploadLogic
+    UploadLogic --> Originals
+    Originals -->|"5. S3 event"| Transform
+    Transform -->|"6. write output"| Transform2
+    Transform2 -->|"6. write output"| Transform3
+    Transform3 -->|"6. write output"| Processed
+    Galleria -->|"7. reads thumbnails"| Processed
+    Galleria -.->|"full-size images"| Originals
+    Transform --> CW
+    Transform2 --> CW
+    Transform3 --> CW
+    UploadLogic --> CW
