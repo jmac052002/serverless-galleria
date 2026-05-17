@@ -1,0 +1,14 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "resize-team-serverless"
+resolve_s3 = true
+s3_prefix = "resize-team-serverless"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "sourceBucket=\"\" destBucket=\"galleria-resized-team-serverless\" maxDimension=\"300\""
+image_repositories = []
+
+[default.global.parameters]
+region = "us-east-1"

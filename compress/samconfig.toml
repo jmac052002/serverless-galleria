@@ -1,0 +1,14 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "compress-team-serverless"
+resolve_s3 = true
+s3_prefix = "compress-team-serverless"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "sourceBucket=\"galleria-resized-team-serverless\" destBucket=\"galleria-thumbs-team-serverless\" quality=\"80\""
+image_repositories = []
+
+[default.global.parameters]
+region = "us-east-1"

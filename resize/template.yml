@@ -7,8 +7,8 @@ Resources:
     Properties:
       Description: Transforms images by resizing to a configured max dimension
       Handler: bundle.handler
-      Runtime: nodejs18.x
-      CodeUri: bundle.js
+      Runtime: nodejs22.x
+      CodeUri: bundle
       MemorySize: 1536
       Policies:
         - S3ReadPolicy:
