@@ -1,0 +1,14 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "uploader-team-serverless"
+resolve_s3 = true
+s3_prefix = "uploader-team-serverless"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "destBucket=\"rotate-team-serverless-source-zyublv2lzkzl\""
+image_repositories = []
+
+[default.global.parameters]
+region = "us-east-1"

@@ -2,7 +2,6 @@
   "name": "serverless-galleria-util",
   "version": "1.2.0",
   "description": "Utility functions shared across serverless galleria lambdas",
-  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

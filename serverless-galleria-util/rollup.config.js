@@ -10,5 +10,5 @@ export default {
 		format: 'cjs'
 	},
     external: [/@aws-sdk\/.*/],
-    plugins: [nodeResolve({preferBuiltins: true}), commonjs(), json()]
+    plugins: [nodeResolve({preferBuiltins: true}), json()]
 };
