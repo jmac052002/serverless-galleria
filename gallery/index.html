@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Serverless Galleria</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0d0f14; color: #e2e8f0; font-family: monospace; }
+    header { padding: 2rem; border-bottom: 1px solid #1e2330; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 1.4rem; color: #f97316; letter-spacing: 0.05em; }
+    header span { font-size: 0.8rem; color: #64748b; }
+    #signout-btn { background: none; border: 1px solid #f97316; color: #f97316; padding: 0.4rem 1rem; cursor: pointer; font-family: monospace; border-radius: 2px; }
+    #signout-btn:hover { background: rgba(249,115,22,0.1); }
+    #status { padding: 2rem; color: #64748b; font-size: 0.85rem; }
+    #gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; padding: 2rem; }
+    .thumb { background: #151820; border: 1px solid #1e2330; border-radius: 4px; overflow: hidden; }
+    .thumb img { width: 100%; height: 180px; object-fit: cover; display: block; }
+    .thumb p { padding: 0.5rem; font-size: 0.7rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80vh; gap: 1rem; }
+    #login-btn { background: #f97316; color: white; border: none; padding: 0.75rem 2rem; font-family: monospace; font-size: 1rem; cursor: pointer; border-radius: 2px; }
+    #login-btn:hover { background: #ea6c0a; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Serverless Galleria</h1>
+  <div>
+    <span id="user-email"></span>
+    <button id="signout-btn" style="display:none" onclick="signOut()">Sign out</button>
+  </div>
+</header>
+
+<div id="status">Loading...</div>
+<div id="login-screen" style="display:none">
+  <p style="color:#64748b">You must be signed in to view the gallery.</p>
+  <button id="login-btn" onclick="signIn()">Sign In</button>
+</div>
+<div id="gallery"></div>
+
+<script type="module">
+  const COGNITO_DOMAIN = 'https://us-east-1fzx3qbfmz.auth.us-east-1.amazoncognito.com'\;
+  const CLIENT_ID     = '5dgoqkfjbmpb9safeu78bdrj9h';
+  const REDIRECT_URI  = window.location.origin + window.location.pathname;
+  const API_URL       = 'https://nryubp88wd.execute-api.us-east-1.amazonaws.com/Prod/images'\;
+
+  window.signIn = () => {
+    window.location.href = `${COGNITO_DOMAIN}/login?client_id=${CLIENT_ID}&response_type=code&scope=openid+email&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+  };
+
+  window.signOut = () => {
+    sessionStorage.clear();
+    window.location.href = `${COGNITO_DOMAIN}/logout?client_id=${CLIENT_ID}&logout_uri=${encodeURIComponent(REDIRECT_URI)}`;
+  };
+
+  async function exchangeCode(code) {
+    const resp = await fetch(`${COGNITO_DOMAIN}/oauth2/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        client_id: CLIENT_ID,
+        code,
+        redirect_uri: REDIRECT_URI
+      })
+    });
+    return resp.json();
+  }
+
+  async function loadGallery(token) {
+    document.getElementById('status').textContent = 'Loading images...';
+    try {
+      const resp = await fetch(API_URL, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!resp.ok) throw new Error(`API returned ${resp.status}`);
+      const data = await resp.json();
+      const gallery = document.getElementById('gallery');
+      document.getElementById('status').textContent = '';
+      if (!data.images.length) {
+        document.getElementById('status').textContent = 'No images found in gallery.';
+        return;
+      }
+      data.images.forEach(img => {
+        const div = document.createElement('div');
+        div.className = 'thumb';
+        div.innerHTML = `<img src="${img.url}" loading="lazy"><p>${img.key}</p>`;
+        gallery.appendChild(div);
+      });
+    } catch (err) {
+      document.getElementById('status').textContent = `Error: ${err.message}`;
+    }
+  }
+
+  async function init() {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+
+    if (code) {
+      history.replaceState({}, '', window.location.pathname);
+      document.getElementById('status').textContent = 'Authenticating...';
+      const tokens = await exchangeCode(code);
+      if (tokens.access_token) {
+        sessionStorage.setItem('access_token', tokens.access_token);
+        sessionStorage.setItem('id_token', tokens.id_token);
+      } else {
+        document.getElementById('status').textContent = 'Auth failed.';
+        document.getElementById('login-screen').style.display = 'flex';
+        return;
+      }
+    }
+
+    const token = sessionStorage.getItem('access_token');
+    if (!token) {
+      document.getElementById('status').textContent = '';
+      document.getElementById('login-screen').style.display = 'flex';
+      return;
+    }
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      document.getElementById('user-email').textContent = payload.username || payload.email || '';
+      document.getElementById('signout-btn').style.display = 'inline-block';
+    } catch {}
+
+    loadGallery(token);
+  }
+
+  init();
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Gallery API - pre-signed URLs for authenticated users
+
+Parameters:
+  thumbsBucket:
+    Type: String
+    Description: S3 bucket containing processed thumbnails
+  userPoolArn:
+    Type: String
+    Description: Cognito User Pool ARN
+
+Resources:
+  GalleryApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: "'GET,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: "'*'"
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !Ref userPoolArn
+
+  images:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Returns pre-signed URLs for gallery images
+      Handler: bundle.handler
+      Runtime: nodejs22.x
+      CodeUri: bundle/
+      MemorySize: 256
+      Timeout: 30
+      Environment:
+        Variables:
+          THUMBS_BUCKET: !Ref thumbsBucket
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref thumbsBucket
+      Events:
+        GetImages:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GalleryApi
+            Path: /images
+            Method: GET
+
+Outputs:
+  ApiUrl:
+    Description: Gallery API endpoint
+    Value: !Sub https://$\{GalleryApi\}.execute-api.$\{AWS::Region\}.amazonaws.com/Prod

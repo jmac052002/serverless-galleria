@@ -1,0 +1,10 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "gallery-team-serverless"
+resolve_s3 = true
+s3_prefix = "gallery-team-serverless"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "thumbsBucket=\"galleria-thumbs-team-serverless\" userPoolArn=\"arn:aws:cognito-idp:us-east-1:584996267165:userpool/us-east-1_Fzx3Q8FMZ\""
