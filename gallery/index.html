@@ -40,10 +40,10 @@
 <div id="gallery"></div>
 
 <script type="module">
-  const COGNITO_DOMAIN = 'https://us-east-1fzx3qbfmz.auth.us-east-1.amazoncognito.com'\;
+  const COGNITO_DOMAIN = 'https://us-east-1fzx3qbfmz.auth.us-east-1.amazoncognito.com';
   const CLIENT_ID     = '5dgoqkfjbmpb9safeu78bdrj9h';
-  const REDIRECT_URI  = window.location.origin + window.location.pathname;
-  const API_URL       = 'https://nryubp88wd.execute-api.us-east-1.amazonaws.com/Prod/images'\;
+  const REDIRECT_URI  = 'https://gallery.josephsdctlabtraining.com';
+  const API_URL       = 'https://nryubp88wd.execute-api.us-east-1.amazonaws.com/Prod/images';
 
   window.signIn = () => {
     window.location.href = `${COGNITO_DOMAIN}/login?client_id=${CLIENT_ID}&response_type=code&scope=openid+email&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
@@ -111,7 +111,7 @@
       }
     }
 
-    const token = sessionStorage.getItem('access_token');
+    const token = sessionStorage.getItem('id_token');
     if (!token) {
       document.getElementById('status').textContent = '';
       document.getElementById('login-screen').style.display = 'flex';
