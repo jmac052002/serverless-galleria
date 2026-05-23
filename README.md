@@ -10,7 +10,7 @@ A fully serverless, authenticated image gallery built on AWS. Images are uploade
 
 | Name | Role |
 |---|---|
-| Joseph McCoy | Architect & Lead Engineer — designed and deployed the full stack |
+| Joseph McCoy | Architect & Lead Engineer designed and deployed the full stack |
 | Bianca | Documentation |
 | Kaled | Collaboration & review |
 | Soga | Collaboration & review |
@@ -108,10 +108,10 @@ User → gallery.josephsdctlabtraining.com
 
 ### Authentication
 - Amazon Cognito User Pool with Hosted UI handles all authentication
-- Self-registration is **disabled** — only admin-created users can log in
-- The Authorization Code Grant (OAuth 2.0) flow is used — the most secure option for web apps
+- Self-registration is **disabled** only admin-created users can log in
+- The Authorization Code Grant (OAuth 2.0) flow is used the most secure option for web apps
 - Tokens are short-lived: ID token and access token expire after 60 minutes
-- Token revocation is enabled — tokens can be invalidated on logout
+- Token revocation is enabled tokens can be invalidated on logout
 
 ### API Protection
 - The Gallery API is protected by a Cognito JWT Authorizer
@@ -123,12 +123,12 @@ User → gallery.josephsdctlabtraining.com
 - The Rotate Lambda role has been scoped to the minimum required permissions:
   - `s3:GetObject` on the rotate source bucket only
   - `s3:PutObject` on the rotate destination bucket only
-- `AmazonS3FullAccess` was removed — it was applied temporarily during development and replaced before submission
+- `AmazonS3FullAccess` was removed it was applied temporarily during development and replaced before submission
 - All Lambda execution roles follow the same principle: only the actions they need, only on the buckets they touch
 
 ### CORS
 - The Gallery API OPTIONS endpoint returns CORS headers with no authorizer (required for browser preflight requests)
-- The `Access-Control-Allow-Origin` header is scoped to `https://gallery.josephsdctlabtraining.com` — not a wildcard
+- The `Access-Control-Allow-Origin` header is scoped to `https://gallery.josephsdctlabtraining.com` not a wildcard
 
 ---
 
@@ -143,11 +143,11 @@ curl -X POST https://sb546sfj0k.execute-api.us-east-1.amazonaws.com/Prod/ \
   -H "Content-Type: image/jpeg"
 ```
 
-Or use the upload page if one is available. The pipeline processes the image automatically — wait 10–15 seconds, then refresh the gallery to see the new thumbnail.
+Or use the upload page if one is available. The pipeline processes the image automatically wait 10–15 seconds, then refresh the gallery to see the new thumbnail.
 
 ### View the Gallery
 1. Visit https://gallery.josephsdctlabtraining.com
-2. Click **Sign In** — you will be redirected to the Cognito hosted login page
+2. Click **Sign In** you will be redirected to the Cognito hosted login page
 3. Enter your credentials (admin-created account required)
 4. After authentication you are redirected back to the gallery and images load automatically
 5. Click **Sign out** to end your session
@@ -158,11 +158,11 @@ Or use the upload page if one is available. The pipeline processes the image aut
 
 | Phase | Description | Status |
 |---|---|---|
-| 1 | Pipeline — S3 buckets, rotate/resize/compress Lambdas | ✅ Complete |
-| 2 | Uploader — API Gateway + Lambda, image upload | ✅ Complete |
-| 3 | Gallery — frontend, CloudFront, Route 53, custom domain | ✅ Complete |
-| 4 | Authentication — Cognito User Pool, Hosted UI, JWT protection | ✅ Complete |
-| 5 | Security polish — IAM least privilege, CORS scope, auth enforcement | ✅ Complete |
+| 1 | Pipeline S3 buckets, rotate/resize/compress Lambdas | ✅ Complete |
+| 2 | Uploader API Gateway + Lambda, image upload | ✅ Complete |
+| 3 | Gallery frontend, CloudFront, Route 53, custom domain | ✅ Complete |
+| 4 | Authentication Cognito User Pool, Hosted UI, JWT protection | ✅ Complete |
+| 5 | Security polish IAM least privilege, CORS scope, auth enforcement | ✅ Complete |
 | 6 | Documentation & presentation | ✅ Complete |
 
 ---
@@ -175,9 +175,9 @@ The transform Lambdas (rotate, resize, compress) use **esbuild** for bundling. T
 
 ## Known Limitations
 
-- IAM least-privilege was applied to the Rotate Lambda via the AWS CLI. This change is not yet reflected in the SAM template — a future improvement would be to define the scoped inline policies directly in `template.yaml` so they are version-controlled and reproducible on fresh deployments.
+- IAM least-privilege was applied to the Rotate Lambda via the AWS CLI. This change is not yet reflected in the SAM template a future improvement would be to define the scoped inline policies directly in `template.yaml` so they are version-controlled and reproducible on fresh deployments.
 - The S3 buckets and some intermediate resources use SAM-generated name suffixes and cannot be reproduced with identical names on a fresh deploy.
 
 ---
 
-*Built for the DCT Cloud Mastery Bootcamp — May 2026*
+*Built for the DCT Cloud Mastery Bootcamp May 2026*
