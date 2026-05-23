@@ -180,4 +180,12 @@ The transform Lambdas (rotate, resize, compress) use **esbuild** for bundling. T
 
 ---
 
+## Demo
+
+A walkthrough of the full authentication flow — unauthenticated access blocked, Cognito login, gallery loading with pre-signed image URLs, and sign out.
+
+[Watch the demo video](https://youtu.be/XXGT32MBsSA)
+
+---
+
 *Built for the DCT Cloud Mastery Bootcamp May 2026*
